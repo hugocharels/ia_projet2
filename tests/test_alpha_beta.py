@@ -1,6 +1,6 @@
 from lle import World, Action
 from adversarial_search import alpha_beta
-from world_mdp import WorldMDP, MyState
+from world_mdp import WorldMDP
 from .graph_mdp import GraphMDP
 
 

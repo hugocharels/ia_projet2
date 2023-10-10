@@ -120,10 +120,6 @@ def test_score_overwritten():
     assert s.value == -1, "When Agent 0 dies, the score should be overwritten by -1."
 
 
-def test_mdp_reset():
-    pass
-
-
 def test_available_actions():
     world = WorldMDP(
         World(
