@@ -7,7 +7,7 @@ def max_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
     best_action = Action.STAY
     best_value = float('-inf')
     for action in mdp.available_actions(state):
-        value = value_action(mdp, mdp.result(state, action), max_depth - 1)[0]
+        value = value_action(mdp, mdp.transition(state, action), max_depth - 1)[0]
         if value > best_value:
             best_value = value
             best_action = action
@@ -17,7 +17,7 @@ def min_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
     best_action = Action.STAY
     best_value = float('inf')
     for action in mdp.available_actions(state):
-        value = value_action(mdp, mdp.result(state, action), max_depth - 1)[0]
+        value = value_action(mdp, mdp.transition(state, action), max_depth - 1)[0]
         if value < best_value:
             best_value = value
             best_action = action
@@ -25,7 +25,7 @@ def min_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
 
 def value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
     if mdp.is_final(state) or max_depth == 0:
-        return mdp.reward(state), Action.STAY
+        return state.value, Action.STAY
     if state.current_agent == 0:
         return max_value_action(mdp, state, max_depth)
     else:

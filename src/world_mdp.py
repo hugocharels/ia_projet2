@@ -34,6 +34,7 @@ class WorldMDP(MDP[Action, MyWorldState]):
         return self.world.done
 
     def transition(self, state: MyWorldState, action: Action) -> MyWorldState:
+        self.n_expanded_states += 1
         self.world.set_state(state.world_state)
         actions = [Action.STAY] * self.world.n_agents
         actions[state.current_agent] = action
