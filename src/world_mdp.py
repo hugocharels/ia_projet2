@@ -13,11 +13,13 @@ class MyWorldState(State):
         self.current_agent = current_agent
         self.world_state = world_state
 
+    def __repr__(self):
+        return f"<MyWorldState(value={self.value},current_agent={self.current_agent},world_state={self.world_state})>"
+
 
 class WorldMDP(MDP[Action, MyWorldState]):
     def __init__(self, world: World):
         self.world = world
-        self.last_values = [0] * self.world.n_agents
 
     def reset(self):
         self.n_expanded_states = 0
@@ -29,21 +31,15 @@ class WorldMDP(MDP[Action, MyWorldState]):
 
     def is_final(self, state: MyWorldState) -> bool:
         self.world.set_state(state.world_state)
-        return all(state.world_state.gems_collected) and (self.world.agents[0].has_arrived or self.world.agents[0].is_dead)
-
-    def update_last_values(self, state: MyWorldState):
-        self.last_values[state.current_agent] = state.value
-
-    def last_value(self, agent_id: int) -> int:
-        return self.last_values[agent_id]
+        return self.world.done
 
     def transition(self, state: MyWorldState, action: Action) -> MyWorldState:
         self.world.set_state(state.world_state)
         actions = [Action.STAY] * self.world.n_agents
         actions[state.current_agent] = action
         value = self.world.step(actions)
-        new_value = state.value + self.last_value(state.current_agent) if not self.world.agents[state.current_agent].is_dead else lle.REWARD_AGENT_DIED
-        self.update_last_values(state)
+        new_value = state.value
+        if state.current_agent == 0: new_value = value + state.value if not self.world.agents[state.current_agent].is_dead else lle.REWARD_AGENT_DIED
         return MyWorldState(new_value, (state.current_agent + 1) % self.world.n_agents, self.world.get_state())
 
 class BetterValueFunction(WorldMDP):
