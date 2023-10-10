@@ -2,23 +2,28 @@
 from lle import World, Action
 from world_mdp import WorldMDP
 from lle import REWARD_AGENT_DIED
+from lle import World, Action
+from adversarial_search import minimax
+from world_mdp import WorldMDP
 
 
 def main():
     world = WorldMDP(
         World(
             """
-    S0 . G
-    S1 X X
+        .  . . . G G S0
+        .  . . @ @ @ G
+        S2 . . X X X G
+        .  . . . G G S1
 """
         )
     )
-    s = world.reset()
-    actions = [Action.EAST, Action.EAST, Action.EAST, Action.STAY, Action.SOUTH]
-    for action in actions:
-        print(s)
-        s = world.transition(s, action)
-    print(s)
+    
+    action = minimax(world, world.reset(), 3)
+    print(action)
+    
+    action = minimax(world, world.reset(), 7)
+    print(action)
 
 
 if __name__ == "__main__":
