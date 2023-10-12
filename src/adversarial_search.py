@@ -32,7 +32,7 @@ def value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
 
 def minimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
     """Returns the best action for the current agent to take in the given state, according to the minimax algorithm."""
-    #if not isinstance(mdp, WorldMDP): raise ValueError
+    if state.current_agent != 0: raise ValueError("The current agent must be 0.")
     return value_action(mdp, state, max_depth)[1]
 
 def alpha_beta(mdp: MDP[A, S], state: S, max_depth: int) -> A:
