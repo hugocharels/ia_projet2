@@ -6,8 +6,6 @@ from mdp import MDP, State
 
 @dataclass
 class MyWorldState(State):
-    world_state = WorldState
-
     def __init__(self, value: int, current_agent: int, world_state: WorldState):
         self.value = value
         self.current_agent = current_agent
@@ -42,6 +40,9 @@ class WorldMDP(MDP[Action, MyWorldState]):
         new_value = state.value
         if state.current_agent == 0: new_value = value + state.value if not self.world.agents[state.current_agent].is_dead else lle.REWARD_AGENT_DIED
         return MyWorldState(new_value, (state.current_agent + 1) % self.world.n_agents, self.world.get_state())
+
+    def __repr__(self):
+        return f"<WorldMDP(world={self.world.world_string})>"
 
 class BetterValueFunction(WorldMDP):
     def transition(self, state: MyWorldState, action: Action) -> MyWorldState:

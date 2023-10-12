@@ -38,13 +38,13 @@ files = [
 
 [[package]]
 name = "laser-learning-environment"
-version = "0.1.5"
+version = "0.1.8"
 description = "A fast Multi-Agent Reinforcement Learning Environment"
 optional = false
 python-versions = ">=3.10"
 files = [
-    {file = "laser_learning_environment-0.1.5-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:546b16d2fbc71b7007f37610864b2cbe16dadf3ba46fa60bf5cda2ed22a9581e"},
-    {file = "laser_learning_environment-0.1.5.tar.gz", hash = "sha256:b14de436ecd21df099e569556c45ff4833c80f598063403687fbc459fa8cb4b3"},
+    {file = "laser_learning_environment-0.1.8-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:8f4c2da744311ddaa9d5139f37c91a8a00eb75286408b2870bdc2ae6cd377418"},
+    {file = "laser_learning_environment-0.1.8.tar.gz", hash = "sha256:8e9d1c38d09a4bdf956f8fdc359eed61e04315264677831a2acdb4ffc29837eb"},
 ]
 
 [[package]]
@@ -154,7 +154,7 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "rlenv"
-version = "0.3.2"
+version = "0.4.0"
 description = "A strongly typed Reinforcement Learning framework"
 optional = false
 python-versions = ">=3.10"
@@ -175,7 +175,7 @@ smac = ["smac @ git+https://github.com/oxwhirl/smac.git"]
 type = "git"
 url = "https://github.com/yamoling/rlenv"
 reference = "HEAD"
-resolved_reference = "e2d164157c000724467d7deea1eaad4ea0ba7b9c"
+resolved_reference = "22afd52f57b62bd4e959917ada7eb83e5f254bbf"
 
 [[package]]
 name = "tomli"

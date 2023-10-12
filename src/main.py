@@ -2,12 +2,21 @@
 from lle import World, Action
 from world_mdp import WorldMDP
 from lle import REWARD_AGENT_DIED
-from lle import World, Action
 from adversarial_search import minimax
-from world_mdp import WorldMDP
+import cv2
+import sys
+sys.path.append("..")
+from tests.graph_mdp import GraphMDP
 
 
 def main():
+    mdp = GraphMDP.parse("tests/graphs/vary-depth.graph")
+    s0 = mdp.reset()
+    s = mdp.transition(s0, "Right")
+    
+
+
+def main2():
     world = WorldMDP(
         World(
             """
