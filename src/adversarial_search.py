@@ -17,8 +17,7 @@ def min_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
     best_value = float('inf')
     for action in mdp.available_actions(state):
         new_state = mdp.transition(state, action)
-        new_depth = max_depth - 1 if new_state.current_agent == 0 else max_depth
-        value = value_action(mdp, new_state, new_depth)[0]
+        value = value_action(mdp, new_state, max_depth - 1 if new_state.current_agent == 0 else max_depth)[0]
         if value < best_value:
             best_value = value
             best_action = action
@@ -57,8 +56,7 @@ def alpha_beta_min_value_action(mdp: MDP[A, S], state: S, max_depth: int, alpha:
     best_value = float('inf')
     for action in mdp.available_actions(state):
         new_state = mdp.transition(state, action)
-        new_depth = max_depth - 1 if new_state.current_agent == 0 else max_depth
-        value = alpha_beta_value_action(mdp, new_state, new_depth)[0]
+        value = alpha_beta_value_action(mdp, new_state, max_depth - 1 if new_state.current_agent == 0 else max_depth, alpha, beta)[0]
         if value < best_value:
             best_value = value
             best_action = action
