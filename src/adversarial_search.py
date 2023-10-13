@@ -16,7 +16,9 @@ def min_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
     best_action = Action.STAY
     best_value = float('inf')
     for action in mdp.available_actions(state):
-        value = value_action(mdp, mdp.transition(state, action), max_depth - 1)[0]
+        new_state = mdp.transition(state, action)
+        new_depth = max_depth - 1 if new_state.current_agent == 0 else max_depth
+        value = value_action(mdp, new_state, new_depth)[0]
         if value < best_value:
             best_value = value
             best_action = action
@@ -24,7 +26,7 @@ def min_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
 
 def value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
     if mdp.is_final(state) or max_depth == 0:
-        return state.value, Action.STAY
+        return state.value, None
     if state.current_agent == 0:
         return max_value_action(mdp, state, max_depth)
     else:
@@ -32,7 +34,8 @@ def value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
 
 def minimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
     """Returns the best action for the current agent to take in the given state, according to the minimax algorithm."""
-    if state.current_agent != 0: raise ValueError("The current agent must be 0.")
+    if state.current_agent != 0:  raise ValueError("The current agent must be 0.")
+    if max_depth < 1: raise ValueError("The maximum depth must be at least 1.")
     return value_action(mdp, state, max_depth)[1]
 
 
@@ -53,7 +56,9 @@ def alpha_beta_min_value_action(mdp: MDP[A, S], state: S, max_depth: int, alpha:
     best_action = Action.STAY
     best_value = float('inf')
     for action in mdp.available_actions(state):
-        value = alpha_beta_value_action(mdp, mdp.transition(state, action), max_depth - 1, alpha, beta)[0]
+        new_state = mdp.transition(state, action)
+        new_depth = max_depth - 1 if new_state.current_agent == 0 else max_depth
+        value = alpha_beta_value_action(mdp, new_state, new_depth)[0]
         if value < best_value:
             best_value = value
             best_action = action
