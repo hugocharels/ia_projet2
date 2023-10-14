@@ -6,83 +6,18 @@ from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
 
-def max_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
-    best_action = Action.STAY
-    best_value = float('-inf')
-    for action in mdp.available_actions(state):
-        value = value_action(mdp, mdp.transition(state, action), max_depth - 1)[0]
-        if value > best_value:
-            best_value = value
-            best_action = action
-    return best_value, best_action
-
-def min_value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
-    best_action = Action.STAY
-    best_value = float('inf')
-    for action in mdp.available_actions(state):
-        new_state = mdp.transition(state, action)
-        value = value_action(mdp, new_state, max_depth - 1 if new_state.current_agent == 0 else max_depth)[0]
-        if value < best_value:
-            best_value = value
-            best_action = action
-    return best_value, best_action
-
-def value_action(mdp: MDP[A, S], state: S, max_depth: int) -> (float, A):
-    if mdp.is_final(state) or max_depth == 0:
-        return state.value, None
-    if state.current_agent == 0:
-        return max_value_action(mdp, state, max_depth)
-    else:
-        return min_value_action(mdp, state, max_depth)
 
 def minimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
-    """Returns the best action for the current agent to take in the given state, according to the minimax algorithm."""
+    """Returns the best action for the agent 0 to take in the given state, according to the minimax algorithm."""
     if state.current_agent != 0:  raise ValueError("The current agent must be 0.")
     if max_depth < 1: raise ValueError("The maximum depth must be at least 1.")
-    #return value_action(mdp, state, max_depth)[1]
-    return AdversarialSearch(mdp, max_depth, "AdversarialSearchStrategy.MINIMAX").search(state)
-
-
-def alpha_beta_max_value_action(mdp: MDP[A, S], state: S, max_depth: int, alpha: float, beta: float) -> (float, A):
-    best_action = Action.STAY
-    best_value = float('-inf')
-    for action in mdp.available_actions(state):
-        value = alpha_beta_value_action(mdp, mdp.transition(state, action), max_depth - 1, alpha, beta)[0]
-        if value > best_value:
-            best_value = value
-            best_action = action
-        if value >= beta:
-            return value, action
-        alpha = value if value > alpha else alpha
-    return best_value, best_action
-
-def alpha_beta_min_value_action(mdp: MDP[A, S], state: S, max_depth: int, alpha: float, beta: float) -> (float, A):
-    best_action = Action.STAY
-    best_value = float('inf')
-    for action in mdp.available_actions(state):
-        new_state = mdp.transition(state, action)
-        value = alpha_beta_value_action(mdp, new_state, max_depth - 1 if new_state.current_agent == 0 else max_depth, alpha, beta)[0]
-        if value < best_value:
-            best_value = value
-            best_action = action
-        if value <= alpha:
-            return value, action
-        beta = value if value < beta else beta
-    return best_value, best_action
-
-def alpha_beta_value_action(mdp: MDP[A, S], state: S, max_depth: int, alpha: float, beta: float) -> (float, A):
-    if mdp.is_final(state) or max_depth == 0:
-        return state.value, Action.STAY
-    if state.current_agent == 0:
-        return alpha_beta_max_value_action(mdp, state, max_depth, alpha, beta)
-    else:
-        return alpha_beta_min_value_action(mdp, state, max_depth, alpha, beta)
-
+    return MinimaxSearch(mdp).search(state, max_depth)[1]
 
 def alpha_beta(mdp: MDP[A, S], state: S, max_depth: int) -> A:
     """Returns the best action for the current agent to take in the given state, according to the alpha-beta algorithm."""
     if state.current_agent != 0: raise ValueError("The current agent must be 0.")
-    return alpha_beta_value_action(mdp, state, max_depth, float('-inf'), float('inf'))[1]
+    if max_depth < 1: raise ValueError("The maximum depth must be at least 1.")
+    return AlphaBetaSearch(mdp).search(state, max_depth)[1]
 
 
 def expectimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
@@ -90,97 +25,45 @@ def expectimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
 
 
 
-
-
-class AdversarialSearch:
-
-    def __init__(self, mdp: MDP[A, S], max_depth: int, strategy):#: AdversarialSearchStrategy):
+class AdversarialSearch(ABC, Generic[A, S]):
+    def __init__(self, mdp: MDP[A, S]):
         self.mdp = mdp
-        self.max_depth = max_depth
-        self.strategy = strategy
 
-    def search(self, state: S) -> A:
-        if state.current_agent != 0: raise ValueError("The current agent must be 0.")
-        stack = Stack()
-        stack.push(Node(state, None, 0))
+    @abstractmethod
+    def compare(self, maximize: bool, *args) -> (float, A, bool):
+        ...
+
+    def _get_successors(self, state: S) -> [S]:
+        for action in self.mdp.available_actions(state):
+            yield self.mdp.transition(state, action), action
+
+    def search(self, state: S, max_depth: int, alpha: float=float('-inf'), beta: float=float('inf')) -> (float, A):
+        if max_depth == 0 or self.mdp.is_final(state):
+            return state.value, None
+        maximize = True if state.current_agent == 0 else False
+        best_value = float('-inf') if maximize else float('inf')
         best_action = None
-        best_value = 0
-        while not stack.is_empty():
-            node = stack.pop()
-            if self.mdp.is_final(node.state) or node.depth == self.max_depth: continue 
-            maximize = True if node.state.current_agent == 0 else False
-            best_value = float('-inf') if maximize else float('inf')
-            
-            for action in self.mdp.available_actions(node.state):
-                new_state = self.mdp.transition(node.state, action)
-                stack.push(Node(new_state, action, node.depth + 1 if not maximize and new_state.current_agent == 0 else node.depth))
-                if maximize:
-                    if new_state.value > best_value:
-                        best_value = new_state.value
-                        best_action = action
-                else:
-                    if new_state.value < best_value:
-                        best_value = new_state.value
-                        best_action = action
-
-            if maximize and best_value > node.state.value: best_action = node.action
-            elif not maximize and best_value < node.state.value: best_action = node.action
-
-        return best_action
+        for new_state, action in self._get_successors(state):
+            value = self.search(new_state, max_depth - 1 if maximize or new_state.current_agent == 0 else max_depth, alpha, beta)[0]
+            best_value, best_action, stop = self.compare(maximize, best_value, value, best_action, action, alpha, beta)
+            if stop: break
+            if maximize: alpha = value if value > alpha else alpha
+            else: beta = value if value < beta else beta
+        return best_value, best_action
 
 
+class MinimaxSearch(AdversarialSearch):
+    def compare(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, *_) -> (float, A, bool):
+        return (value, action, False) if (maximize and value > best_value) or (not maximize and value < best_value) else (best_value, best_action, False)
 
 
+class AlphaBetaSearch(AdversarialSearch):
+    def compare(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, alpha: float, beta: float, *_) -> (float, A, bool):
+        if maximize:
+            if value > best_value:
+                return value, action, value >= beta
+        else:
+            if value < best_value:
+                return value, action, value <= alpha
+        return best_value, best_action, False
 
-
-
-
-
-
-
-#################### frontier.py ####################
-
-T = TypeVar("T")
-
-class Frontier(ABC, Generic[T]):
-
-    @abstractmethod
-    def push(node: T) -> None:
-        """ Add a node to the frontier. """
-
-    @abstractmethod
-    def pop() -> T:
-        """ Remove and return the next node from the frontier. """
-
-    @abstractmethod
-    def is_empty() -> bool:
-        """ Return True if the frontier is empty. """
-
-
-class Stack(Frontier[T]):
-
-    def __init__(self):
-        self.queue = LifoQueue()
-
-    #@override(Frontier)
-    def push(self, node: T) -> None:
-        self.queue.put(node)
-
-    #@override(Frontier)
-    def pop(self) -> T:
-        return self.queue.get()
-
-    #@override(Frontier)
-    def is_empty(self) -> bool:
-        return self.queue.empty()
-
-
-@dataclass
-class Node:
-
-    state: S
-    action: Optional[A]
-    depth: int
-
-    def __repr__(self):
-        return f"<Node(state={self.state},parent={self.parent},action={self.action},cost={self.cost},depth={self.depth})>"
