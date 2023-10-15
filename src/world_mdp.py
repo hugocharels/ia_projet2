@@ -47,5 +47,14 @@ class WorldMDP(MDP[Action, MyWorldState]):
 
 class BetterValueFunction(WorldMDP):
     def transition(self, state: MyWorldState, action: Action) -> MyWorldState:
-        # Change the value of the state here.
-        ...
+        self.n_expanded_states += 1
+        self.world.set_state(state.world_state)
+        actions = [Action.STAY] * self.world.n_agents
+        actions[state.current_agent] = action
+        value = self.world.step(actions)
+        new_value = state.value
+        if state.current_agent == 0:
+            new_value = value + state.value if not self.world.agents[state.current_agent].is_dead else lle.REWARD_AGENT_DIED
+        if state.current_agent != 0:
+            new_value = value + state.value if not self.world.agents[state.current_agent].is_dead else -lle.REWARD_AGENT_DIED
+        return MyWorldState(new_value, (state.current_agent + 1) % self.world.n_agents, self.world.get_state())
