@@ -48,8 +48,8 @@ class AdversarialSearch(ABC, Generic[A, S]):
             value = self.search(new_state, max_depth - 1 if maximize or new_state.current_agent == 0 else max_depth, alpha, beta)[0]
             best_value, best_action, stop = self.compare(maximize, best_value, value, best_action, action, alpha, beta)
             if stop: break
-            if maximize: alpha = value if value > alpha else alpha
-            else: beta = value if value < beta else beta
+            if maximize: alpha = max(alpha, value)
+            else: beta = min(beta, value)
         return best_value, best_action
 
 class MinimaxSearch(AdversarialSearch):
@@ -58,19 +58,26 @@ class MinimaxSearch(AdversarialSearch):
 
 class AlphaBetaSearch(AdversarialSearch):
     def compare(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, alpha: float, beta: float, *_) -> (float, A, bool):
-        if maximize:
-            if value > best_value:
-                return value, action, value >= beta
-        else:
-            if value < best_value:
-                return value, action, value <= alpha
+        if maximize and value > best_value: return value, action, value >= beta
+        elif not maximize and value < best_value: return value, action, value <= alpha
         return best_value, best_action, False
 
-class ExpectimaxSearch(AlphaBetaSearch):
-    def _get_successors(self, state: S, maximize: bool) -> [S]:
-        if maximize:
-            for action in self.mdp.available_actions(state):
-                yield self.mdp.transition(state, action), action
-        else:
-            action = choice(self.mdp.available_actions(state))
-            yield self.mdp.transition(state, action), action
+class ExpectimaxSearch(MinimaxSearch):
+    def search(self, state: S, max_depth: int, alpha: float = float('-inf'), beta: float = float('inf')) -> (float, A):
+        if max_depth == 0 or self.mdp.is_final(state):
+            return state.value, None
+        maximize = True if state.current_agent == 0 else False
+        if not maximize:
+            successors = list(self._get_successors(state, maximize))
+            # Calculate the expected value for chance nodes
+            expected_value = sum(self.search(new_state, max_depth - 1, alpha, beta)[0] for new_state, _ in successors) / len(successors)
+            return expected_value, None
+        best_value = float('-inf') if maximize else float('inf')
+        best_action = None
+        for new_state, action in self._get_successors(state, maximize):
+            value = self.search(new_state, max_depth - 1, alpha, beta)[0]
+            best_value, best_action, stop = self.compare(maximize, best_value, value, best_action, action, alpha, beta)
+            if stop: break
+            if maximize: alpha = max(alpha, value)
+            else: beta = min(beta, value)
+        return best_value, best_action

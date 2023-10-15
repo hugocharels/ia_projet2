@@ -46,6 +46,10 @@ class WorldMDP(MDP[Action, MyWorldState]):
         return f"<WorldMDP(world={self.world.world_string})>"
 
 class BetterValueFunction(WorldMDP):
+
+    def _gems_remaining(self, state: MyWorldState) -> int:
+        return self.world.n_gems - sum(state.world_state.gems_collected)
+
     def transition(self, state: MyWorldState, action: Action) -> MyWorldState:
         self.n_expanded_states += 1
         self.world.set_state(state.world_state)
@@ -53,8 +57,7 @@ class BetterValueFunction(WorldMDP):
         actions[state.current_agent] = action
         value = self.world.step(actions)
         new_value = state.value
-        if state.current_agent == 0:
-            new_value = value + state.value if not self.world.agents[state.current_agent].is_dead else lle.REWARD_AGENT_DIED
-        if state.current_agent != 0:
-            new_value = value + state.value if not self.world.agents[state.current_agent].is_dead else -lle.REWARD_AGENT_DIED
+        if self.world.agents[state.current_agent].is_dead: new_value = lle.REWARD_AGENT_DIED
+        elif value == 1: new_value += self.world.n_gems - self._gems_remaining(state)
+        else: new_value += value
         return MyWorldState(new_value, (state.current_agent + 1) % self.world.n_agents, self.world.get_state())
