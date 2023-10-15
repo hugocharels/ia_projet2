@@ -1,32 +1,51 @@
 #!/usr/bin/env python3
 from lle import World, Action
 from world_mdp import WorldMDP, BetterValueFunction
-from lle import REWARD_AGENT_DIED
 from adversarial_search import minimax, alpha_beta, expectimax
-import cv2
+import csv
 
+
+WORLDS = [
+World("""
+.  . . . G G S0
+.  . . @ @ @ G
+S2 . . X X X G
+.  . . . G G S1
+"""
+),
+
+]
+
+
+DEPTHS = [*range(1, 11)]
+
+WMDPS = (WorldMDP, BetterValueFunction)
+
+ALGOS = ((alpha_beta, "alpha_beta"), (expectimax, "expectimax"))
 
 
 def main():
-    
+    results = []
+    for i in range(len(WORLDS)):
+        for depth in DEPTHS:
+            for WMDP in WMDPS:
+                for algo, name in ALGOS:
+                    world = WMDP(WORLDS[i])
+                    action = algo(world, world.reset(), depth)
+                    n_states = world.n_expanded_states
+                    results.append([i, depth, WMDP.__name__, name, action, n_states])
 
-    w = World(
-        """
-        .  . . . G G S0
-        .  . . @ @ @ G
-        S2 . . X X X G
-        .  . . . G G S1
-    """
-    )
+    # Écrivez les résultats dans un fichier CSV
+    with open('results.csv', 'w', newline='') as csvfile:
+        fieldnames = ['World', 'Depth', 'WMDP', 'Algorithm', 'Algorithm Name', 'Expanded States']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
-    depths = [*range(1, 10)]
-    for depth in depths:
-        print(f"----------------------------------\nfor depth={depth}")
-        for WMDP in (WorldMDP, BetterValueFunction):
-            for algo in (alpha_beta,):
-                world = WMDP(w)
-                print(f"<WorldMDP={WMDP.__name__},algo={algo.__name__},depth={depth} : {algo(world, world.reset(), depth)}>")
-                print(f"Number of expanded states: {world.n_expanded_states}")
+        writer.writeheader()
+        for result in results:
+            writer.writerow({'World': str(result[0]), 'Depth': result[1], 'WMDP': result[2], 'Algorithm': result[3], 'Algorithm Name': result[4], 'Expanded States': result[5]})
+
+    print("Les résultats ont été enregistrés dans le fichier results.csv")
+
 
 if __name__ == "__main__":
 	main()
