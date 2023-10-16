@@ -21,7 +21,7 @@ DEPTHS = [*range(1, 11)]
 
 WMDPS = (WorldMDP, BetterValueFunction)
 
-ALGOS = ((alpha_beta, "alpha_beta"), (expectimax, "expectimax"))
+ALGOS = ((alpha_beta, "alpha_beta"),)
 
 
 def main():
