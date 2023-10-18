@@ -1,0 +1,21 @@
+World,Depth,WMDP,Algorithm,Algorithm Name,Expanded States
+0,1,WorldMDP,alpha_beta,North,4
+0,1,BetterValueFunction,alpha_beta,Stay,4
+0,2,WorldMDP,alpha_beta,North,14
+0,2,BetterValueFunction,alpha_beta,Stay,11
+0,3,WorldMDP,alpha_beta,Stay,28
+0,3,BetterValueFunction,alpha_beta,Stay,25
+0,4,WorldMDP,alpha_beta,Stay,59
+0,4,BetterValueFunction,alpha_beta,Stay,46
+0,5,WorldMDP,alpha_beta,Stay,101
+0,5,BetterValueFunction,alpha_beta,Stay,91
+0,6,WorldMDP,alpha_beta,Stay,203
+0,6,BetterValueFunction,alpha_beta,Stay,160
+0,7,WorldMDP,alpha_beta,Stay,345
+0,7,BetterValueFunction,alpha_beta,Stay,302
+0,8,WorldMDP,alpha_beta,Stay,677
+0,8,BetterValueFunction,alpha_beta,Stay,517
+0,9,WorldMDP,alpha_beta,Stay,1149
+0,9,BetterValueFunction,alpha_beta,Stay,970
+0,10,WorldMDP,alpha_beta,Stay,2271
+0,10,BetterValueFunction,alpha_beta,Stay,1661
