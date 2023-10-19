@@ -1,21 +1,7 @@
-World,Depth,WMDP,Algorithm,Algorithm Name,Expanded States
-0,1,WorldMDP,alpha_beta,South,3
-0,1,BetterValueFunction,alpha_beta,Stay,3
-0,2,WorldMDP,alpha_beta,South,35
-0,2,BetterValueFunction,alpha_beta,Stay,22
-0,3,WorldMDP,alpha_beta,West,115
-0,3,BetterValueFunction,alpha_beta,South,72
-0,4,WorldMDP,alpha_beta,West,865
-0,4,BetterValueFunction,alpha_beta,South,498
-0,5,WorldMDP,alpha_beta,Stay,1724
-0,5,BetterValueFunction,alpha_beta,South,1299
-0,6,WorldMDP,alpha_beta,Stay,11476
-0,6,BetterValueFunction,alpha_beta,South,8707
-0,7,WorldMDP,alpha_beta,South,31723
-0,7,BetterValueFunction,alpha_beta,Stay,14116
-0,8,WorldMDP,alpha_beta,South,192497
-0,8,BetterValueFunction,alpha_beta,Stay,99894
-0,9,WorldMDP,alpha_beta,Stay,379464
-0,9,BetterValueFunction,alpha_beta,Stay,147131
-0,10,WorldMDP,alpha_beta,Stay,2288459
-0,10,BetterValueFunction,alpha_beta,Stay,1101262
+World,Depth,WMDP,Algorithm,Action,Expanded States
+0,5,WorldMDP,Alpha-Beta,Stay,438
+0,5,BetterValueFunction,Alpha-Beta,Stay,431
+1,5,WorldMDP,Alpha-Beta,Stay,545
+1,5,BetterValueFunction,Alpha-Beta,Stay,305
+2,5,WorldMDP,Alpha-Beta,Stay,303
+2,5,BetterValueFunction,Alpha-Beta,Stay,503

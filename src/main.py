@@ -20,6 +20,14 @@ S1 G S0 G . X
 . . . . . X
 """
 ),
+World("""
+. . . G .
+X . X @ @
+. G @ G G
+. S0 . G G
+. S1 . @ @
+"""),
+
 ]
 
 #WORLDS[0].reset()
@@ -35,7 +43,7 @@ ALGOS = ((alpha_beta, "alpha_beta"),)
 
 def main():
     results = []
-    for i in range(len(WORLDS)-1):
+    for i in range(1, len(WORLDS)-1):
         cv2.imwrite("world_{}.png".format(i), WORLDS[i].get_image())
         for depth in DEPTHS:
             print(depth)
