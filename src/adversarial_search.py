@@ -1,21 +1,12 @@
 from lle import Action
 from mdp import MDP, S, A
+from world_mdp import MY_AGENT, override
 from queue import Queue as LifoQueue
 from typing import Optional, Generic, TypeVar
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from random import choice
 
-
-MY_AGENT = 0
-
-
-def override(abstract_class):
-    """ Override decorator """
-    def overrider(method):
-        assert(method.__name__ in dir(abstract_class))
-        return method
-    return overrider
 
 def checker(func):
     """ Decorator that checks the arguments of the decorated function """
@@ -37,8 +28,6 @@ def alpha_beta(mdp: MDP[A, S], state: S, max_depth: int) -> A:
 @checker
 def expectimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
     return ExpectimaxSearch(mdp).search(state, max_depth)[1]
-
-
 
 
 class AdversarialSearch(ABC, Generic[A, S]):
