@@ -286,7 +286,7 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "rlenv"
-version = "0.4.0"
+version = "0.4.1"
 description = "A strongly typed Reinforcement Learning framework"
 optional = false
 python-versions = ">=3.10,<4.0"
@@ -308,7 +308,7 @@ smac = ["smac @ git+https://github.com/oxwhirl/smac.git"]
 type = "git"
 url = "https://github.com/yamoling/rlenv"
 reference = "HEAD"
-resolved_reference = "1103797f77648ecc7229a86706bed0a75f2ce584"
+resolved_reference = "9000d03d319eebd15f41d68b93cceb1d727e4864"
 
 [[package]]
 name = "tomli"
