@@ -8,14 +8,6 @@ import cv2
 
 WORLDS = [
 World("""
-. . . . .
-. G . G .
-. . . . .
-. X . X .
-. S0 . S1 .
-"""
-),
-World("""
 S1 G S0 G . X
 . . . . . X
 """
@@ -34,21 +26,23 @@ X . X @ @
 #WORLDS[0].step([Action.WEST, Action.EAST])
 
 
-DEPTHS = [*range(1, 11)]
+DEPTHS = [*range(1, 14, 2)]
 
 WMDPS = (WorldMDP,BetterValueFunction)
 
-ALGOS = ((alpha_beta, "alpha_beta"),)
+ALGOS = ((minimax, "minimax"), (alpha_beta, "alpha_beta"))
 
 
 def main():
     results = []
-    for i in range(1, len(WORLDS)-1):
-        cv2.imwrite("world_{}.png".format(i), WORLDS[i].get_image())
+    for i in range(1, len(WORLDS)):
+        cv2.imwrite(f"world_{i+1}.png", WORLDS[i].get_image())
         for depth in DEPTHS:
             print(depth)
             for WMDP in WMDPS:
                 for algo, name in ALGOS:
+                    if BetterValueFunction == WMDP and algo == minimax:continue
+
                     world = WMDP(WORLDS[i])
                     s0 = world.reset()
 
@@ -58,12 +52,12 @@ def main():
 
     # Écrivez les résultats dans un fichier CSV
     with open('results_newworld1.csv', 'w', newline='') as csvfile:
-        fieldnames = ['World', 'Depth', 'WMDP', 'Algorithm', 'Algorithm Name', 'Expanded States']
+        fieldnames = ['World', 'Depth', 'WMDP', 'Algorithm', 'Expanded States']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
         writer.writeheader()
         for result in results:
-            writer.writerow({'World': str(result[0]), 'Depth': result[1], 'WMDP': result[2], 'Algorithm': result[3], 'Algorithm Name': result[4], 'Expanded States': result[5]})
+            writer.writerow({'World': str(result[0]), 'Depth': result[1], 'WMDP': result[2], 'Algorithm': result[3], 'Expanded States': result[5]})
 
     print("Les résultats ont été enregistrés dans le fichier results.csv")
 
