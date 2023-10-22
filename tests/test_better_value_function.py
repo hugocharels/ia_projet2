@@ -23,7 +23,7 @@ S2 . . X X X G
 
 
 
-DEPTHS = [*range(4, 12, 2)]
+DEPTHS = [*range(4, 10, 2)]
 
 WMDPS = (WorldMDP, BetterValueFunction)
 

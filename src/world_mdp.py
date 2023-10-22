@@ -64,4 +64,5 @@ class BetterValueFunction(WorldMDP):
     def _compute_value(self, state: MyWorldState, step_reward: float) -> float:
         if self.world.agents[state.current_agent].is_dead: return lle.REWARD_AGENT_DIED
         if step_reward == 1: return state.value + self.world.n_gems - self._gems_remaining(state)
-        return state.value + step_reward
+        if self.world.n_gems == self._gems_remaining(state): return state.value + step_reward
+        return state.value
