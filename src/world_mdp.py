@@ -22,6 +22,15 @@ class MyWorldState(State):
         self.current_agent = current_agent
         self.world_state = world_state
 
+    def _key(self):
+        return self.world_state, self.current_agent, self.value
+
+    def __eq__(self, other):
+        return self._key() == other._key()
+
+    def __hash__(self):
+        return hash(self._key())
+
     def __repr__(self):
         return f"<MyWorldState(value={self.value},current_agent={self.current_agent},world_state={self.world_state})>"
 
