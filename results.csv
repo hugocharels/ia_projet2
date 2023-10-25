@@ -1,7 +1,0 @@
-World,Depth,WMDP,Algorithm,Action,Expanded States
-0,5,WorldMDP,Alpha-Beta,Stay,438
-0,5,BetterValueFunction,Alpha-Beta,Stay,431
-1,5,WorldMDP,Alpha-Beta,Stay,545
-1,5,BetterValueFunction,Alpha-Beta,Stay,305
-2,5,WorldMDP,Alpha-Beta,Stay,303
-2,5,BetterValueFunction,Alpha-Beta,Stay,503
