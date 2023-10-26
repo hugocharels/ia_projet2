@@ -17,7 +17,7 @@ GENERATE_DATA = True
 DATA_FILENAME = 'temp.csv'
 # DATA_FILENAME = 'temp2.csv'
 
-DEPTH_MAX = 15
+DEPTH_MAX = 10
 # DEPTH_MAX = 6
 
 GENERATE_GRAPHICS = True
@@ -46,8 +46,18 @@ X . X @ @
 . S1 . @ @
 """)
 
+WORLD3 = World("""
+. . @ G G @ . .
+@ @ @ G G @ @ @
+. G . . . . G .
+G G . S0 S1 . G .
+@ @ . . . . @ @
+. . X G G X . .
+""")
 
-WORLDS, WMDPS = [WORLD1, WORLD2, World("""S0 G  .  X\n.  .  .  .\nX . S1 .\n""")], (WorldMDP, BetterValueFunction)
+
+
+WORLDS, WMDPS = [WORLD1, WORLD2, WORLD3], (WorldMDP, BetterValueFunction)
 
 ALGOS = ((minimax, "minimax"), (alpha_beta, "alpha_beta"))
 # ALGOS = ((minimax, "minimax"), (alpha_beta, "alpha_beta"), (expectimax, "expectimax"))
@@ -66,7 +76,7 @@ def generateData():
     with open(DATA_FILENAME, 'w', newline='') as csvfile:
         fieldnames = ['World', 'Depth', 'WMDP', 'Algorithm', 'Algorithm Name', 'Expanded States']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        for i in range(len(WORLDS) - 1):
+        for i in range(len(WORLDS)):
             for depth in DEPTHS:
                 scores = []
                 for algo, name in ALGOS:
@@ -111,20 +121,20 @@ def generateTripleBarChart(filename, barename1, barename2, barename3, color1, co
     plt.close()
 
 def generateGraphics():
-    dataset = [ ['MiniMax', 'blue', extractData('0', 'WorldMDP', 'minimax')],
-                ['MDP-alpha_beta', 'red', extractData('0', 'WorldMDP', 'alpha_beta')],
-                ['BetterValue-alpha_beta', 'green', extractData('0', 'BetterValueFunction', 'alpha_beta')],
+    dataset = [ ['Minimax', 'blue', extractData('0', 'WorldMDP', 'minimax')],
+                ['AlphaBeta', 'red', extractData('0', 'WorldMDP', 'alpha_beta')],
+                ['BetterValue AlphaBeta', 'green', extractData('0', 'BetterValueFunction', 'alpha_beta')],
                 ['MiniMax', 'blue', extractData('1', 'WorldMDP', 'minimax')],
-                ['MDP-alpha_beta', 'red', extractData('1', 'WorldMDP', 'alpha_beta')],
-                ['BetterValue-alpha_beta', 'green', extractData('1', 'BetterValueFunction', 'alpha_beta')],
+                ['AlphaBeta', 'red', extractData('1', 'WorldMDP', 'alpha_beta')],
+                ['BetterValue AlphaBeta', 'green', extractData('1', 'BetterValueFunction', 'alpha_beta')],
                 ['MiniMax', 'blue', extractData('2', 'WorldMDP', 'minimax')],
-                ['MDP-alpha_beta', 'red', extractData('2', 'WorldMDP', 'alpha_beta')],
-                ['BetterValue-alpha_beta', 'green', extractData('2', 'BetterValueFunction', 'alpha_beta')] ]
+                ['AlphaBeta', 'red', extractData('2', 'WorldMDP', 'alpha_beta')],
+                ['BetterValue AlphaBeta', 'green', extractData('2', 'BetterValueFunction', 'alpha_beta')] ]
 
     if GENERATE_GRAPHICS:
         generateTripleBarChart(W1_FILENAME, dataset[0][0], dataset[1][0], dataset[2][0], dataset[0][1], dataset[1][1], dataset[2][1], dataset[0][2], dataset[1][2], dataset[2][2])
         generateTripleBarChart(W2_FILENAME, dataset[3][0], dataset[4][0], dataset[5][0], dataset[3][1], dataset[4][1], dataset[5][1], dataset[3][2], dataset[4][2], dataset[5][2])
-        #generateTripleBarChart(W3_FILENAME, dataset[6][0], dataset[7][0], dataset[8][0], dataset[6][1], dataset[7][1], dataset[8][1], dataset[6][2], dataset[7][2], dataset[8][2])
+        generateTripleBarChart(W3_FILENAME, dataset[6][0], dataset[7][0], dataset[8][0], dataset[6][1], dataset[7][1], dataset[8][1], dataset[6][2], dataset[7][2], dataset[8][2])
         
         print (f"Les graphiques ont été enregistrés dans les fichiers {W1_FILENAME}, {W2_FILENAME} et {W3_FILENAME}")
     else:

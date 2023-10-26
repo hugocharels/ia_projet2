@@ -15,7 +15,6 @@ def checker(func):
         return func(mdp, state, max_depth)
     return wrapper
 
-
 @checker
 def minimax(mdp: MDP[A, S], state: S, max_depth: int) -> A:
     return MinimaxSearch(mdp).search(state, max_depth)[1]
@@ -34,13 +33,19 @@ class AdversarialSearch(ABC, Generic[A, S]):
         self.mdp = mdp
         self.visited_states = dict()
 
+    def _is_done(func):
+        def wrapper(self, state: S, depth: int, *args):
+            if depth == 0 or self.mdp.is_final(state): return (state.value,)
+            return func(self, state, depth, *args)
+        return wrapper
+
     def _compare(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, *_) -> (float, A, bool):
         return (value, action, False) if (maximize and value > best_value) or (not maximize and value < best_value) else (best_value, best_action, False)
 
     def _get_successors(self, state: S, maximize: bool, depth: int) -> [S]:
         for action in self.mdp.available_actions(state):
             new_state = self.mdp.transition(state, action)
-            if self._is_visited(new_state, depth + 1): continue
+            #if self._is_visited(new_state, depth + 1): continue
             yield new_state, action
 
     def _is_visited(self, state: S, depth: int) -> bool:
@@ -56,16 +61,15 @@ class AdversarialSearch(ABC, Generic[A, S]):
 
 class MinimaxSearch(AdversarialSearch):
 
+    @AdversarialSearch._is_done
     @override(AdversarialSearch)
     def search(self, state: S, depth: int) -> (float, A):
-        if depth == 0 or self.mdp.is_final(state):
-            return state.value, None
         maximize = True if state.current_agent == MY_AGENT else False
         best_value = float('-inf') if maximize else float('inf')
         best_action = None
         for new_state, action in self._get_successors(state, maximize, depth):
             value = self.search(new_state, depth - 1 if maximize or new_state.current_agent == MY_AGENT else depth)[0]
-            best_value, best_action, stop = self._compare(maximize, best_value, value, best_action, action)
+            best_value, best_action, _ = self._compare(maximize, best_value, value, best_action, action)
         return best_value, best_action
 
 
@@ -76,10 +80,9 @@ class AlphaBetaSearch(AdversarialSearch):
         new_best_value, new_best_action, _ = super()._compare(maximize, best_value, value, best_action, action)
         return new_best_value, new_best_action, True if (maximize and new_best_value >= beta) or (not maximize and new_best_value <= alpha) else False
 
+    @AdversarialSearch._is_done
     @override(AdversarialSearch)
     def search(self, state: S, depth: int, alpha: float=float('-inf'), beta: float=float('inf')) -> (float, A):
-        if depth == 0 or self.mdp.is_final(state):
-            return state.value, None
         maximize = True if state.current_agent == MY_AGENT else False
         best_value = float('-inf') if maximize else float('inf')
         best_action = None
@@ -94,10 +97,9 @@ class AlphaBetaSearch(AdversarialSearch):
 
 class ExpectimaxSearch(MinimaxSearch):
 
+    @AdversarialSearch._is_done
     @override(AdversarialSearch)
     def search(self, state: S, depth: int) -> (float, A):
-        if depth == 0 or self.mdp.is_final(state):
-            return state.value, None
         maximize = True if state.current_agent == MY_AGENT else False
         if not maximize:
             successors = list(self._get_successors(state, maximize, depth))
