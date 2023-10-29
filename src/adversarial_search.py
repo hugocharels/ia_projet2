@@ -39,7 +39,7 @@ class AdversarialSearch(ABC, Generic[A, S]):
             return func(self, state, depth, *args)
         return wrapper
 
-    def _compare(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, *_) -> (float, A, bool):
+    def _eval_scores(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, *_) -> (float, A, bool):
         return (value, action, False) if (maximize and value > best_value) or (not maximize and value < best_value) else (best_value, best_action, False)
 
     def _get_successors(self, state: S, maximize: bool, depth: int) -> [S]:
@@ -69,15 +69,15 @@ class MinimaxSearch(AdversarialSearch):
         best_action = None
         for new_state, action in self._get_successors(state, maximize, depth):
             value = self.search(new_state, depth - 1 if maximize or new_state.current_agent == MY_AGENT else depth)[0]
-            best_value, best_action, _ = self._compare(maximize, best_value, value, best_action, action)
+            best_value, best_action, _ = self._eval_scores(maximize, best_value, value, best_action, action)
         return best_value, best_action
 
 
 class AlphaBetaSearch(AdversarialSearch):
 
     @override(AdversarialSearch)
-    def _compare(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, alpha: float, beta: float) -> (float, A, bool):
-        new_best_value, new_best_action, _ = super()._compare(maximize, best_value, value, best_action, action)
+    def _eval_scores(self, maximize: bool, best_value: float, value: float, best_action: A, action: A, alpha: float, beta: float) -> (float, A, bool):
+        new_best_value, new_best_action, _ = super()._eval_scores(maximize, best_value, value, best_action, action)
         return new_best_value, new_best_action, True if (maximize and new_best_value >= beta) or (not maximize and new_best_value <= alpha) else False
 
     @AdversarialSearch._is_done
@@ -88,7 +88,7 @@ class AlphaBetaSearch(AdversarialSearch):
         best_action = None
         for new_state, action in self._get_successors(state, maximize, depth):
             value = self.search(new_state, depth - 1 if maximize or new_state.current_agent == MY_AGENT else depth, alpha, beta)[0]
-            best_value, best_action, stop = self._compare(maximize, best_value, value, best_action, action, alpha, beta)
+            best_value, best_action, stop = self._eval_scores(maximize, best_value, value, best_action, action, alpha, beta)
             if stop: break
             if maximize: alpha = max(alpha, value)
             else: beta = min(beta, value)
@@ -110,5 +110,5 @@ class ExpectimaxSearch(MinimaxSearch):
         best_action = None
         for new_state, action in self._get_successors(state, maximize, depth):
             value = self.search(new_state, depth - 1)[0]
-            best_value, best_action, stop = self._compare(maximize, best_value, value, best_action, action)
+            best_value, best_action, stop = self._eval_scores(maximize, best_value, value, best_action, action)
         return best_value, best_action

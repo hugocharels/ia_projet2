@@ -39,14 +39,17 @@ class WorldMDP(MDP[Action, MyWorldState]):
     def __init__(self, world: World):
         self.world = world
 
+    @override(MDP)
     def reset(self):
         self.n_expanded_states = 0
         self.world.reset()
         return MyWorldState(0, 0, self.world.get_state())
 
+    @override(MDP)
     def available_actions(self, state: MyWorldState) -> list[Action]:
         return self.world.available_actions()[state.current_agent]
 
+    @override(MDP)
     def is_final(self, state: MyWorldState) -> bool:
         self.world.set_state(state.world_state)
         return self.world.done
@@ -54,6 +57,7 @@ class WorldMDP(MDP[Action, MyWorldState]):
     def _compute_value(self, state: MyWorldState, step_reward: float) -> float:
         return (state.value + step_reward if not self.world.agents[state.current_agent].is_dead else lle.REWARD_AGENT_DIED) if state.current_agent == MY_AGENT else state.value
 
+    @override(MDP)
     def transition(self, state: MyWorldState, action: Action) -> MyWorldState:
         self.n_expanded_states += 1
         self.world.set_state(state.world_state)
@@ -70,6 +74,7 @@ class BetterValueFunction(WorldMDP):
     def _gems_remaining(self, state: MyWorldState) -> int:
         return self.world.n_gems - sum(state.world_state.gems_collected)
 
+    @override(WorldMDP)
     def _compute_value(self, state: MyWorldState, step_reward: float) -> float:
         if self.world.agents[state.current_agent].is_dead: return lle.REWARD_AGENT_DIED
         if step_reward == 1: return state.value + self.world.n_gems - self._gems_remaining(state)
